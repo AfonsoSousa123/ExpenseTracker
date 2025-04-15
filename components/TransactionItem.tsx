@@ -25,11 +25,10 @@ const TransactionItem = ({
           {transaction.type === "income" ? "+" : "-"}
           {transaction.amount}€
         </Text>
-        {onDelete && (
-          <TouchableOpacity onPress={() => onDelete(transaction.id)}>
-            <Text style={styles.delete}>🗑️</Text>
-          </TouchableOpacity>
-        )}
+
+        <TouchableOpacity onPress={() => onDelete(transaction.id)}>
+          <Text style={styles.delete}>🗑️</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
