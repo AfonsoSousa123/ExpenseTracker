@@ -9,6 +9,7 @@ import HomeScreen from "./screens/HomeScreen";
 import AddTransactionScreen from "./screens/AddTransactionScreen";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useColorScheme } from "react-native";
+import BottomNavigationBar from "./components/layout/BottomNavigationBar";
 
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +27,7 @@ export default function App() {
             options={{ title: "Nova Transação" }}
           />
         </Stack.Navigator>
+        <BottomNavigationBar />
       </NavigationContainer>
     </SafeAreaProvider>
   );
