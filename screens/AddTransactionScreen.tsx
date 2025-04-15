@@ -1,10 +1,19 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  Alert,
+  ScrollView,
+} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import uuid from "react-native-uuid";
 // @ts-ignore
 import { useNavigation } from "@react-navigation/native";
 import { Transaction } from "../types/Transaction";
+import { Picker } from "@react-native-picker/picker";
 
 const STORAGE_KEY = "@transactions";
 
@@ -39,7 +48,7 @@ const AddTransactionScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.label}>Title</Text>
       <TextInput style={styles.input} value={title} onChangeText={setTitle} />
       <Text style={styles.label}>Amount</Text>
@@ -55,21 +64,27 @@ const AddTransactionScreen = () => {
         value={category}
         onChangeText={setCategory}
       />
-      <Text style={styles.label}>Type (income or expense)</Text>
-      <TextInput
-        style={styles.input}
-        value={type}
-        onChangeText={(v) => setType(v as "income" | "expense")}
-      />
-      <Button color={"#007076"} title="Save" onPress={handleSave} />
-    </View>
+      <Text style={styles.label}>Type</Text>
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={type}
+          onValueChange={(value) => setType(value as "income" | "expense")}
+          style={styles.picker}
+        >
+          <Picker.Item label="Select Type" value="" />
+          <Picker.Item label="Income" value="income" />
+          <Picker.Item label="Expense" value="expense" />
+        </Picker>
+      </View>
+      <Button color={"#007076"} title="Save +" onPress={handleSave} />
+    </ScrollView>
   );
 };
 
 export default AddTransactionScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: "#000000" },
+  container: { flexGrow: 1, padding: 16, backgroundColor: "#000000" },
   input: {
     borderWidth: 1,
     color: "#ffffff",
@@ -83,8 +98,15 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     fontSize: 18,
   },
-  saveBtn: {
-    marginTop: 30,
-    color: "#007076",
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: "#007076",
+    borderRadius: 8,
+    marginBottom: 12,
+    overflow: "hidden",
+  },
+  picker: {
+    color: "#ffffff",
+    backgroundColor: "#000000",
   },
 });
