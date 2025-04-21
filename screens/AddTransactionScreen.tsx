@@ -25,7 +25,7 @@ const AddTransactionScreen = () => {
   const navigation = useNavigation();
 
   const handleSave = async () => {
-    if (!title || !amount || !category || !type) {
+    if (!title || !amount || !type) {
       Alert.alert("Error", "Fill all fields");
       return;
     }
@@ -34,7 +34,7 @@ const AddTransactionScreen = () => {
       id: uuid.v4().toString(),
       title,
       amount: parseFloat(amount),
-      category,
+      category: "not set",
       type,
       date: new Date().toISOString().split("T")[0],
     };
@@ -48,43 +48,62 @@ const AddTransactionScreen = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.label}>Title</Text>
-      <TextInput style={styles.input} value={title} onChangeText={setTitle} />
-      <Text style={styles.label}>Amount</Text>
-      <TextInput
-        style={styles.input}
-        value={amount}
-        onChangeText={setAmount}
-        keyboardType="numeric"
-      />
-      <Text style={styles.label}>Category</Text>
-      <TextInput
-        style={styles.input}
-        value={category}
-        onChangeText={setCategory}
-      />
-      <Text style={styles.label}>Type</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={type}
-          onValueChange={(value) => setType(value as "income" | "expense")}
-          style={styles.picker}
-        >
-          <Picker.Item label="Select Type" value="" />
-          <Picker.Item label="Income" value="income" />
-          <Picker.Item label="Expense" value="expense" />
-        </Picker>
-      </View>
-      <Button color={"#007076"} title="Save +" onPress={handleSave} />
-    </ScrollView>
+    <>
+      <Text style={styles.header}>New Transaction</Text>
+
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.label}>Title</Text>
+        <TextInput style={styles.input} value={title} onChangeText={setTitle} />
+        <Text style={styles.label}>Amount</Text>
+        <TextInput
+          style={styles.input}
+          value={amount}
+          onChangeText={setAmount}
+          keyboardType="numeric"
+        />
+        <Text style={styles.label}>Category</Text>
+        <TextInput
+          style={styles.input}
+          value={category}
+          onChangeText={setCategory}
+        />
+        <Text style={styles.label}>Type</Text>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={type}
+            onValueChange={(value) => setType(value as "income" | "expense")}
+            style={styles.picker}
+          >
+            <Picker.Item label="Select Type" value="" />
+            <Picker.Item label="Income" value="income" />
+            <Picker.Item label="Expense" value="expense" />
+          </Picker>
+        </View>
+        <Button color={"#007076"} title="Save +" onPress={handleSave} />
+      </ScrollView>
+    </>
   );
 };
 
 export default AddTransactionScreen;
 
 const styles = StyleSheet.create({
-  container: { flexGrow: 1, padding: 16, backgroundColor: "#000000" },
+  container: {
+    flexGrow: 1,
+    padding: 16,
+    backgroundColor: "#000000",
+  },
+  header: {
+    backgroundColor: "#007076",
+    // borderRadius: 8,
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+    fontSize: 26,
+    textAlign: "center",
+    fontWeight: "bold",
+    height: 120,
+    color: "#ffffff",
+  },
   input: {
     borderWidth: 1,
     color: "#ffffff",

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, Text, StyleSheet } from "react-native";
+import { ScrollView, FlatList, Text, StyleSheet, View } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import { Transaction } from "../types/Transaction";
 import TransactionItem from "../components/TransactionItem";
@@ -60,17 +60,23 @@ const HomeScreen = () => {
 
   return (
     <>
-      <FlatList
-        data={transactions}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TransactionItem transaction={item} onDelete={handleDeleteRequest} />
-        )}
-        ListHeaderComponent={
-          <Text style={styles.header}>Balance: {balance}€</Text>
-        }
-        contentContainerStyle={styles.container}
-      />
+      <Text style={styles.header}>Balance: {balance}€</Text>
+
+      <View style={styles.listContainer}>
+        <FlatList
+          data={transactions}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <TransactionItem
+              transaction={item}
+              onDelete={handleDeleteRequest}
+            />
+          )}
+          scrollEnabled={isFocused}
+          contentContainerStyle={styles.listContent}
+        />
+      </View>
+
       <ConfirmModal
         visible={isModalVisible}
         onConfirm={handleConfirmDelete}
@@ -84,21 +90,30 @@ const HomeScreen = () => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  container: {
+  scrollContainer: {
+    flexGrow: 1,
     padding: 16,
     backgroundColor: "#000000",
-    height: "100%",
   },
   header: {
     backgroundColor: "#007076",
-    borderRadius: 8,
-    padding: 14,
-    fontSize: 24,
-    alignContent: "center",
-    alignItems: "center",
+    // borderRadius: 8,
+    paddingVertical: 40,
+    paddingHorizontal: 20,
+    fontSize: 26,
     textAlign: "center",
     fontWeight: "bold",
-    marginBottom: 16,
+    height: 120,
     color: "#ffffff",
+  },
+  listContainer: {
+    flex: 1,
+    maxHeight: 2000,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    backgroundColor: "#000000",
+  },
+  listContent: {
+    paddingBottom: 16,
   },
 });
