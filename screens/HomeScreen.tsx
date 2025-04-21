@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, FlatList, Text, StyleSheet, View } from "react-native";
+import {
+  ScrollView,
+  FlatList,
+  Text,
+  StyleSheet,
+  View,
+  Button,
+} from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import { Transaction } from "../types/Transaction";
 import TransactionItem from "../components/TransactionItem";
@@ -15,10 +22,18 @@ const HomeScreen = () => {
     null
   );
   const [isModalVisible, setModalVisible] = useState(false);
+  const [filter, setFilter] = useState<"all" | "income" | "expense">("all");
 
   const loadTransactions = async () => {
     const data = await AsyncStorage.getItem(STORAGE_KEY);
-    if (data) setTransactions(JSON.parse(data));
+    if (data) {
+      const parsedTransactions = JSON.parse(data);
+      const sortedTransactions = parsedTransactions.sort(
+        (a: Transaction, b: Transaction) =>
+          new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
+      setTransactions(sortedTransactions);
+    }
   };
 
   const onDelete = async (id: string) => {
@@ -58,13 +73,37 @@ const HomeScreen = () => {
     0
   );
 
+  // Filter transactions based on the selected filter
+  const filteredTransactions = transactions.filter((transaction) => {
+    if (filter === "all") return true;
+    return transaction.type === filter;
+  });
+
   return (
     <>
       <Text style={styles.header}>Balance: {balance}€</Text>
 
+      <View style={styles.filterContainer}>
+        <Button
+          color={"#007076"}
+          title="All"
+          onPress={() => setFilter("all")}
+        />
+        <Button
+          color={"#007076"}
+          title="Income"
+          onPress={() => setFilter("income")}
+        />
+        <Button
+          color={"#007076"}
+          title="Expenses"
+          onPress={() => setFilter("expense")}
+        />
+      </View>
+
       <View style={styles.listContainer}>
         <FlatList
-          data={transactions}
+          data={filteredTransactions}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <TransactionItem
@@ -73,6 +112,7 @@ const HomeScreen = () => {
             />
           )}
           scrollEnabled={isFocused}
+          showsVerticalScrollIndicator={true}
           contentContainerStyle={styles.listContent}
         />
       </View>
@@ -90,14 +130,8 @@ const HomeScreen = () => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-    padding: 16,
-    backgroundColor: "#000000",
-  },
   header: {
     backgroundColor: "#007076",
-    // borderRadius: 8,
     paddingVertical: 40,
     paddingHorizontal: 20,
     fontSize: 26,
@@ -106,9 +140,14 @@ const styles = StyleSheet.create({
     height: 120,
     color: "#ffffff",
   },
+  filterContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "#000000",
+    paddingVertical: 10,
+  },
   listContainer: {
     flex: 1,
-    maxHeight: 2000,
     paddingHorizontal: 16,
     paddingVertical: 16,
     backgroundColor: "#000000",
