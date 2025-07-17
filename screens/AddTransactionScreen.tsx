@@ -10,6 +10,8 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import uuid from "react-native-uuid";
+import { TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons"; // Install expo/vector-icons if needed
 // @ts-ignore
 import { useNavigation } from "@react-navigation/native";
 import { Transaction } from "../types/Transaction";
@@ -49,6 +51,21 @@ const AddTransactionScreen = () => {
 
   return (
     <>
+      <TouchableOpacity
+        style={{
+          position: "absolute",
+          top: 40,
+          left: 20,
+          zIndex: 1,
+          padding: 5,
+          backgroundColor: "#003d42",
+          borderRadius: 50,
+        }}
+        onPress={() => navigation.goBack()}
+      >
+        <Ionicons name="arrow-back" size={32} color="#fff" />
+      </TouchableOpacity>
+
       <Text style={styles.header}>New Transaction</Text>
 
       <ScrollView contentContainerStyle={styles.container}>

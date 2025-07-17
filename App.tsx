@@ -31,7 +31,7 @@ export default function App() {
             <Stack.Screen
               name="AddTransaction"
               component={AddTransactionScreen}
-              options={{ title: "Nova Transação", headerShown: false }}
+              options={{ title: "New Transaction", headerShown: false }}
             />
           </Stack.Navigator>
           <BottomNavigationBar />
