@@ -28,6 +28,7 @@ const AddTransactionScreen = () => {
   const [category, setCategory] = useState("");
   const [categories, setCategories] = useState<string[]>([]);
   const [type, setType] = useState<"income" | "expense" | "">("");
+  const [categoryError, setCategoryError] = useState<string | null>(null); // Validation error state
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -53,6 +54,13 @@ const AddTransactionScreen = () => {
       );
       return;
     }
+
+    if (!category) {
+      setCategoryError("Category is required.");
+      return;
+    }
+
+    setCategoryError(null); // Clear error if validation passes
 
     const usedCategory = category || "not set";
     const newTransaction: Transaction = {
@@ -148,7 +156,7 @@ const AddTransactionScreen = () => {
             value={category}
             onChangeText={setCategory}
             placeholder="Or type a new category"
-            placeholderTextColor="#555555" // Customize placeholder color
+            placeholderTextColor="#555555"
           />
           <Text style={styles.label}>Type</Text>
           <View style={styles.pickerContainer}>
@@ -162,6 +170,8 @@ const AddTransactionScreen = () => {
               <Picker.Item label="Expense" value="expense" />
             </Picker>
           </View>
+
+          {categoryError && <Text style={styles.error}>{categoryError}</Text>}
 
           <TouchableOpacity
             style={{
