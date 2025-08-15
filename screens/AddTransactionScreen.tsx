@@ -113,6 +113,8 @@ const AddTransactionScreen = () => {
             style={styles.input}
             value={title}
             onChangeText={setTitle}
+            placeholder="Enter title"
+            placeholderTextColor="#555555" // Customize placeholder color
           />
           <Text style={styles.label}>Amount</Text>
           <TextInput
@@ -125,6 +127,8 @@ const AddTransactionScreen = () => {
               }
             }}
             keyboardType="decimal-pad"
+            placeholder="Enter amount (e.g. 100.00)"
+            placeholderTextColor="#555555" // Customize placeholder color
           />
           <Text style={styles.label}>Category</Text>
           <View style={styles.pickerContainer}>
@@ -144,6 +148,7 @@ const AddTransactionScreen = () => {
             value={category}
             onChangeText={setCategory}
             placeholder="Or type a new category"
+            placeholderTextColor="#555555" // Customize placeholder color
           />
           <Text style={styles.label}>Type</Text>
           <View style={styles.pickerContainer}>
@@ -205,11 +210,12 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    color: "#ffffff",
     borderColor: "#007076",
+    borderRadius: 8,
     padding: 15,
     marginBottom: 12,
-    borderRadius: 8,
+    color: "#ffffff", // Text color
+    backgroundColor: "#000000", // Background color
   },
   label: {
     color: "#ffffff",
@@ -221,10 +227,12 @@ const styles = StyleSheet.create({
     borderColor: "#007076",
     borderRadius: 8,
     marginBottom: 12,
-    overflow: "hidden",
+    overflow: "hidden", // Ensures the picker fits within the container
+    backgroundColor: "#000000", // Background for the container
   },
   picker: {
-    color: "#ffffff",
-    backgroundColor: "#000000",
+    color: "#ffffff", // Text color inside the picker
+    backgroundColor: "#000000", // Background color for the picker
+    height: 50, // Adjust height
   },
 });
