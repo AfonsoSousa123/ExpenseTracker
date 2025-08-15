@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,8 @@ import {
   StyleSheet,
   Alert,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import uuid from "react-native-uuid";
@@ -18,13 +20,23 @@ import { Transaction } from "../types/Transaction";
 import { Picker } from "@react-native-picker/picker";
 
 const STORAGE_KEY = "@transactions";
+const CATEGORY_KEY = "@categories";
 
 const AddTransactionScreen = () => {
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("");
+  const [categories, setCategories] = useState<string[]>([]);
   const [type, setType] = useState<"income" | "expense" | "">("");
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      const data = await AsyncStorage.getItem(CATEGORY_KEY);
+      if (data) setCategories(JSON.parse(data));
+    };
+    loadCategories();
+  }, []);
 
   const handleSave = async () => {
     const normalizedAmount = amount.replace(",", ".");
@@ -42,19 +54,31 @@ const AddTransactionScreen = () => {
       return;
     }
 
+    const usedCategory = category || "not set";
     const newTransaction: Transaction = {
       id: uuid.v4().toString(),
       title,
       amount: parseFloat(normalizedAmount),
-      category: "not set",
+      category: usedCategory,
       type,
       date: new Date().toISOString().split("T")[0],
     };
 
+    // Save transaction
     const existing = await AsyncStorage.getItem(STORAGE_KEY);
     const transactions = existing ? JSON.parse(existing) : [];
     transactions.push(newTransaction);
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
+
+    // Save new category if not already present
+    if (category && !categories.includes(category)) {
+      const updatedCategories = [...categories, category];
+      setCategories(updatedCategories);
+      await AsyncStorage.setItem(
+        CATEGORY_KEY,
+        JSON.stringify(updatedCategories)
+      );
+    }
 
     navigation.goBack();
   };
@@ -78,41 +102,80 @@ const AddTransactionScreen = () => {
 
       <Text style={styles.header}>New Transaction</Text>
 
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.label}>Title</Text>
-        <TextInput style={styles.input} value={title} onChangeText={setTitle} />
-        <Text style={styles.label}>Amount</Text>
-        <TextInput
-          style={styles.input}
-          value={amount}
-          onChangeText={(text) => {
-            // Allow numbers with up to 2 decimals, using . or ,
-            if (/^\d*([.,]?\d{0,2})?$/.test(text)) {
-              setAmount(text);
-            }
-          }}
-          keyboardType="decimal-pad"
-        />
-        <Text style={styles.label}>Category</Text>
-        <TextInput
-          style={styles.input}
-          value={category}
-          onChangeText={setCategory}
-        />
-        <Text style={styles.label}>Type</Text>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={type}
-            onValueChange={(value) => setType(value as "income" | "expense")}
-            style={styles.picker}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={0} // adjust as needed for your header
+      >
+        <ScrollView contentContainerStyle={styles.container}>
+          <Text style={styles.label}>Title</Text>
+          <TextInput
+            style={styles.input}
+            value={title}
+            onChangeText={setTitle}
+          />
+          <Text style={styles.label}>Amount</Text>
+          <TextInput
+            style={styles.input}
+            value={amount}
+            onChangeText={(text) => {
+              // Allow numbers with up to 2 decimals, using . or ,
+              if (/^\d*([.,]?\d{0,2})?$/.test(text)) {
+                setAmount(text);
+              }
+            }}
+            keyboardType="decimal-pad"
+          />
+          <Text style={styles.label}>Category</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={category}
+              onValueChange={setCategory}
+              style={styles.picker}
+            >
+              <Picker.Item label="Select Category" value="" />
+              {categories.map((cat) => (
+                <Picker.Item key={cat} label={cat} value={cat} />
+              ))}
+            </Picker>
+          </View>
+          <TextInput
+            style={styles.input}
+            value={category}
+            onChangeText={setCategory}
+            placeholder="Or type a new category"
+          />
+          <Text style={styles.label}>Type</Text>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={type}
+              onValueChange={(value) => setType(value as "income" | "expense")}
+              style={styles.picker}
+            >
+              <Picker.Item label="Select Type" value="" />
+              <Picker.Item label="Income" value="income" />
+              <Picker.Item label="Expense" value="expense" />
+            </Picker>
+          </View>
+
+          <TouchableOpacity
+            style={{
+              zIndex: 1,
+              padding: 10,
+              backgroundColor: "#007645",
+              borderRadius: 20,
+              flexDirection: "row",
+              alignItems: "center",
+              marginTop: 10,
+              justifyContent: "center",
+            }}
+            onPress={() => handleSave()}
           >
-            <Picker.Item label="Select Type" value="" />
-            <Picker.Item label="Income" value="income" />
-            <Picker.Item label="Expense" value="expense" />
-          </Picker>
-        </View>
-        <Button color={"#007076"} title="Save +" onPress={handleSave} />
-      </ScrollView>
+            <Text style={styles.save}>SAVE</Text>
+            <Ionicons name="add" size={32} color="#fff" />
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </>
   );
 };
@@ -135,6 +198,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     height: 120,
     color: "#ffffff",
+  },
+  save: {
+    color: "#ffffff",
+    fontSize: 18,
   },
   input: {
     borderWidth: 1,
