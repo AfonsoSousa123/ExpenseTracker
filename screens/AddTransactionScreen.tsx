@@ -27,15 +27,25 @@ const AddTransactionScreen = () => {
   const navigation = useNavigation();
 
   const handleSave = async () => {
-    if (!title || !amount || !type) {
-      Alert.alert("Error", "Fill all fields");
+    const normalizedAmount = amount.replace(",", ".");
+    if (
+      !title ||
+      !normalizedAmount ||
+      !type ||
+      isNaN(Number(normalizedAmount)) ||
+      !/^\d*\.?\d{0,2}$/.test(normalizedAmount)
+    ) {
+      Alert.alert(
+        "Error",
+        "Fill all fields with valid values (max 2 decimals)"
+      );
       return;
     }
 
     const newTransaction: Transaction = {
       id: uuid.v4().toString(),
       title,
-      amount: parseFloat(amount),
+      amount: parseFloat(normalizedAmount),
       category: "not set",
       type,
       date: new Date().toISOString().split("T")[0],
@@ -75,8 +85,13 @@ const AddTransactionScreen = () => {
         <TextInput
           style={styles.input}
           value={amount}
-          onChangeText={setAmount}
-          keyboardType="numeric"
+          onChangeText={(text) => {
+            // Allow numbers with up to 2 decimals, using . or ,
+            if (/^\d*([.,]?\d{0,2})?$/.test(text)) {
+              setAmount(text);
+            }
+          }}
+          keyboardType="decimal-pad"
         />
         <Text style={styles.label}>Category</Text>
         <TextInput
